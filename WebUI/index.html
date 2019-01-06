@@ -117,6 +117,7 @@
 		<script src="script/windows/Inspector.js"></script>
 		<script src="script/windows/DebugWindow.js"></script>
 		<script src="script/windows/Hierarchy.js"></script>
+		<script src="script/windows/VisualEnvironmentEditor.js"></script>
 		<script src="script/windows/ContentView.js"></script>
 		<script src="script/windows/ViewPortComponent.js"></script>
 		<script src="script/windows/HistoryWindow.js"></script>
@@ -248,12 +249,12 @@
 
 	<script>
 
-			var debugMode = false;
-			var vext = new VEXTInterface();
-			if(window.location.href.indexOf("webui") === -1) {
-				debugMode = true;
-			}
-			var editor = new Editor(debugMode);
+		var debugMode = false;
+		var vext = new VEXTInterface();
+		if(window.location.href.indexOf("webui") === -1) {
+			debugMode = true;
+		}
+		var editor = new Editor(debugMode);
 
-    </script>
+	</script>
 </html>
