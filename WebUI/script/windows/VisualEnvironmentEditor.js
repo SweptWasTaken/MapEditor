@@ -134,7 +134,11 @@ class VisualEnvironmentEditor {
             placholderText.text("CinematicTools Yo");
 
             let fieldTestHolder = $(document.createElement("div"));
-            let sliderField = CreateFloat('p_Class', 'p_Field', 'p_Type', 'p_Value');
+            let p_Class = 'testClass';
+            let p_Field = 'testField';
+            let p_Type = 'testField';
+            let p_Value = 10;
+            let sliderField = CreateFloat(p_Class, p_Field, p_Type, p_Value);
             fieldTestHolder.append(sliderField);
 
             tabContent.append(placholderText);
