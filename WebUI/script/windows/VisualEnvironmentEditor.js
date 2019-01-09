@@ -54,65 +54,10 @@ class VisualEnvironmentEditor {
             }
         });
         content.append(opacitySlider);
+        // Use the legacy category control logic for testing the legacy UI (i.e. tab-based) method of category selection
+        let useLegacyCategoryControlLogic = false;
+        let categoryControl = GetCategoryControl(useLegacyCategoryControlLogic);
 
-		let categoryControl = $(document.createElement("div"));
-        categoryControl.addClass("category");
-
-		let categoryLabel = $(document.createElement("label"));
-		categoryLabel.attr("for", "objectCategory");
-		categoryLabel.text("Category");
-        categoryControl.append(categoryLabel);
-
-
-		let categorySelect = $(document.createElement("select"));
-		categoryControl.append(categorySelect);
-		categorySelect.attr({
-			"id": "objectCategory",
-			"type": "select",
-			"value": "category"
-		});
-
-
-		let categoryOptions = ["Info", "Presets"];
-		let supportedCategories = [
-            "CameraParams",
-            "CharacterLighting",
-            "ColorCorrection",
-            "DamageEffect",
-            "Dof",
-            "DynamicAO",
-            "DynamicEnvmap",
-            "Enlighten",
-            "FilmGrain",
-            "Fog",
-            "LensScope",
-            "MotionBlur",
-            "OutdoorLight",
-            "PlanarReflection",
-            "ScreenEffect",
-            "Sky",
-            "SunFlare",
-            "Tonemap",
-            "Vignette",
-            "Wind"
-		];
-
-        // optionLabel will be the category name passed to getControlGroupMap()
-        let optionLabel = null;
-        // Append supportedCategories to categoryOptions
-		categoryOptions.push.apply(categoryOptions, supportedCategories);
-		for(let i = 0; i < categoryOptions.length; i++){
-		    let option = document.createElement("option");
-
-            optionLabel = categoryOptions[i];
-            option.value = optionLabel;
-            if (optionLabel == null){
-                option.value = (i+1).toString();
-                optionLabel = "sample" + option.value;
-		    }
-            option.innerHTML = optionLabel;
-            categorySelect.append(option);
-        }
         content.append(categoryControl);
 
         let categoryControlGroup = $(document.createElement("div"));
@@ -124,7 +69,100 @@ class VisualEnvironmentEditor {
 		categoryControlGroup.append(categoryControlGroupText);
 		content.append(categoryControlGroup);
 
-		this.category = categorySelect;
+//		this.category = categorySelect;
+		this.category = categoryControl;
+
+        function GetCategoryControl(useLegacyCategoryControlLogic=true){
+            // This is a placeholder function to be used while we get the categoryControl logic working
+            let categoryControl = null;
+            if (useLegacyCategoryControlLogic !== true){
+                categoryControl = $(document.createElement("div"));
+                categoryControl.addClass("category");
+
+                let categoryLabel = $(document.createElement("label"));
+                categoryLabel.attr("for", "objectCategory");
+                categoryLabel.text("Category");
+                categoryControl.append(categoryLabel);
+
+
+                let categorySelect = $(document.createElement("select"));
+                categoryControl.append(categorySelect);
+                categorySelect.attr({
+                    "id": "objectCategory",
+                    "type": "select",
+                    "value": "category"
+                });
+
+
+                let categoryOptions = ["Info", "Presets"];
+                let supportedCategories = [
+                    "CameraParams",
+                    "CharacterLighting",
+                    "ColorCorrection",
+                    "DamageEffect",
+                    "Dof",
+                    "DynamicAO",
+                    "DynamicEnvmap",
+                    "Enlighten",
+                    "FilmGrain",
+                    "Fog",
+                    "LensScope",
+                    "MotionBlur",
+                    "OutdoorLight",
+                    "PlanarReflection",
+                    "ScreenEffect",
+                    "Sky",
+                    "SunFlare",
+                    "Tonemap",
+                    "Vignette",
+                    "Wind"
+                ];
+
+                // optionLabel will be the category name passed to getControlGroupMap()
+                let optionLabel = null;
+                // Append supportedCategories to categoryOptions
+                categoryOptions.push.apply(categoryOptions, supportedCategories);
+                for(let i = 0; i < categoryOptions.length; i++){
+                    let option = document.createElement("option");
+
+                    optionLabel = categoryOptions[i];
+                    option.value = optionLabel;
+                    if (optionLabel == null){
+                        option.value = (i+1).toString();
+                        optionLabel = "sample" + option.value;
+                    }
+                    option.innerHTML = optionLabel;
+                    categorySelect.append(option);
+                }
+            }
+            else {
+                categoryControl = $(document.createElement("ul"));
+                categoryControl.attr({
+                    "id": "tabs"
+                });
+                let infoTab = $(document.createElement("li"));
+                let infoTabLink = $(document.createElement("a"));
+                infoTabLink.attr({
+                    "href": "#Info",
+                });
+                infoTabLink.text("Info");
+                infoTab.append(infoTabLink);
+
+                let presetsTab = $(document.createElement("li"));
+                let presetsTabLink = $(document.createElement("a"));
+                presetsTabLink.attr({
+                    "href": "#Presets",
+                    "onclick": "UpdateCurrentPreset()",
+                });
+                presetsTabLink.text("Presets");
+                presetsTab.append(presetsTabLink);
+
+                categoryControl.append(infoTab);
+                categoryControl.append(presetsTab);
+            }
+
+            return categoryControl;
+        }
 
 		function GetInfoTabContent(){
             let tabContent = $(document.createElement("div"));
@@ -277,15 +315,26 @@ class VisualEnvironmentEditor {
                 }
             }
 		}
-
-		$(categorySelect).on('change',function(event){
-            // $this is the categorySelect element that fired the change event
-            let $this = this;
-            let newCategoryName = $this.value;
-            UpdateCategoryControlGroup(newCategoryName);
-			if (editor.selectionGroup.children.length === 0){ return;}
-			editor.execute(new SetObjectNameCommand(editor.selectionGroup.children[0].guid, this.value));
-		});
+        if (useLegacyCategoryControlLogic !== true) {
+            $(document).on("change", "#objectCategory", function(event){
+                // $this is the categorySelect element that fired the change event
+                let $this = this;
+                let newCategoryName = $this.value;
+                UpdateCategoryControlGroup(newCategoryName);
+                if (editor.selectionGroup.children.length === 0){ return;}
+                editor.execute(new SetObjectNameCommand(editor.selectionGroup.children[0].guid, newCategoryName));
+            });
+        }
+        else {
+            $(document).on("click", "ul#tabs li a", function(event){
+                // $this is the categorySelect element that fired the change event
+                let $this = this;
+                let newCategoryName = $this.text;
+                UpdateCategoryControlGroup(newCategoryName);
+                if (editor.selectionGroup.children.length === 0){ return;}
+                editor.execute(new SetObjectNameCommand(editor.selectionGroup.children[0].guid, newCategoryName));
+            });
+        }
 
 		this.dom = content;
 	}
