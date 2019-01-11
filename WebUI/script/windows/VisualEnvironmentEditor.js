@@ -56,17 +56,47 @@ class VisualEnvironmentEditor {
         content.append(opacitySlider);
         // Use the legacy category control logic for testing the legacy UI (i.e. tab-based) method of category selection
         let useLegacyCategoryControlLogic = true;
+        let categoryOptions = ["Info", "Presets"];
+        let supportedCategories = [
+            "CameraParams",
+            "CharacterLighting",
+            "ColorCorrection",
+            "DamageEffect",
+            "Dof",
+            "DynamicAO",
+            "DynamicEnvmap",
+            "Enlighten",
+            "FilmGrain",
+            "Fog",
+            "LensScope",
+            "MotionBlur",
+            "OutdoorLight",
+            "PlanarReflection",
+            "ScreenEffect",
+            "Sky",
+            "SunFlare",
+            "Tonemap",
+            "Vignette",
+            "Wind"
+        ];
+        if (useLegacyCategoryControlLogic===false){
+            // In this case, we're not using the Lua client logic to add supportCategories to categoryOptions in-game
+            // Append supportedCategories to categoryOptions
+            categoryOptions.push.apply(categoryOptions, supportedCategories);
+        }
         let categoryControl = GetCategoryControl(useLegacyCategoryControlLogic);
 
         content.append(categoryControl);
 
         let categoryControlGroup = $(document.createElement("div"));
 
-        categoryControlGroup.addClass("category-control-group");
-        categoryControlGroup.addClass("ui-widget-content");
-        let categoryControlGroupText = $(document.createElement("span"));
+        categoryControlGroup.attr({
+            "id": "content",
+            "class": "category-control-group ui-widget-content"
+        });
+
+        InitCategoryControlGroup();
         UpdateCategoryControlGroup("Info");
-		categoryControlGroup.append(categoryControlGroupText);
 		content.append(categoryControlGroup);
 
 //		this.category = categorySelect;
@@ -93,35 +123,8 @@ class VisualEnvironmentEditor {
                     "value": "category"
                 });
 
-
-                let categoryOptions = ["Info", "Presets"];
-                let supportedCategories = [
-                    "CameraParams",
-                    "CharacterLighting",
-                    "ColorCorrection",
-                    "DamageEffect",
-                    "Dof",
-                    "DynamicAO",
-                    "DynamicEnvmap",
-                    "Enlighten",
-                    "FilmGrain",
-                    "Fog",
-                    "LensScope",
-                    "MotionBlur",
-                    "OutdoorLight",
-                    "PlanarReflection",
-                    "ScreenEffect",
-                    "Sky",
-                    "SunFlare",
-                    "Tonemap",
-                    "Vignette",
-                    "Wind"
-                ];
-
                 // optionLabel will be the category name passed to getControlGroupMap()
                 let optionLabel = null;
-                // Append supportedCategories to categoryOptions
-                categoryOptions.push.apply(categoryOptions, supportedCategories);
                 for(let i = 0; i < categoryOptions.length; i++){
                     let option = document.createElement("option");
 
@@ -293,28 +296,51 @@ class VisualEnvironmentEditor {
                     category = "selected";
                 }
                 controlGroupContent = controlGroupContent.format(category);
+                let tabContent = $(document.createElement("div"));
+                tabContent.attr({"id": category});
+
+                let placholderText = $(document.createElement("div"));
+                placholderText.text(controlGroupContent);
+                tabContent.append(placholderText);
+                controlGroupContent = tabContent;
 		    }
 		    return controlGroupContent;
 		}
 
-		function UpdateCategoryControlGroup(newCategoryName) {
-		    // Empty the categoryControlGroupText element, and then append the contents of the selected tab to it
-            categoryControlGroupText.empty();
-
-            let newTabContent = GetControlGroupContent(newCategoryName);
-            if (typeof newTabContent === 'string') {
-                categoryControlGroupText.text(newTabContent);
-            }
-            else {
-                categoryControlGroupText.append(newTabContent);
+        function InitCategoryControlGroup() {
+		    // Empty the categoryControlGroup element, and then populate it with tab contents
+            categoryControlGroup.empty();
+            categoryOptions.forEach(function(newCategoryName, index){
+                let newTabContent = GetControlGroupContent(newCategoryName);
+                if (typeof newTabContent === 'string') {
+                    let placholderText = $(document.createElement("div"));
+                    newTabContent = placholderText.text(newTabContent);
+                }
+                categoryControlGroup.append(newTabContent);
                 // This is a hack
                 // TODO: Create a generic way to call a function or functions for a tab once its content has loaded
                 // .load() might work
                 if (newCategoryName === "Presets") {
                     UpdateCurrentPreset();
                 }
-            }
+            });
 		}
+
+		function UpdateCategoryControlGroup(newCategoryName) {
+		    // Hide all of the categoryControlGroup element contents, and then show the contents of the selected tab
+            let allTabContent = categoryControlGroup.children();
+            allTabContent.hide();
+
+            // This is a hack
+            // TODO: Create a generic way to call a function or functions for a tab once its content has loaded
+            // .load() might work
+            if (newCategoryName === "Presets") {
+                UpdateCurrentPreset();
+            }
+            let selectedTab = "#{0}".format(newCategoryName);
+            allTabContent.filter(selectedTab).show();
+		}
+
         if (useLegacyCategoryControlLogic !== true) {
             $(document).on("change", "#objectCategory", function(event){
                 // $this is the categorySelect element that fired the change event
