@@ -55,7 +55,7 @@ class VisualEnvironmentEditor {
         });
         content.append(opacitySlider);
         // Use the legacy category control logic for testing the legacy UI (i.e. tab-based) method of category selection
-        let useLegacyCategoryControlLogic = false;
+        let useLegacyCategoryControlLogic = true;
         let categoryControl = GetCategoryControl(useLegacyCategoryControlLogic);
 
         content.append(categoryControl);
