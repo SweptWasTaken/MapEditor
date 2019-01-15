@@ -58,7 +58,6 @@ function MapEditorClient:RegisterEvents()
 	self.m_StateAddedEvent = Events:Subscribe('VE:StateAdded', self, self.OnStateAdded)
 	self.m_StateRemovedEvent = Events:Subscribe('VE:StateRemoved', self, self.OnStateRemoved)
 	self.m_OnLoadedEvent = Events:Subscribe('ExtensionLoaded', self, self.OnLoaded)
-	self.m_OnUpdateInputEvent = Events:Subscribe('Client:UpdateInput', self, self.OnUpdateInput)
 	self.m_OnWebUIUpdateEvent = Events:Subscribe('CT:UpdateValue', self, self.OnUpdateValue)
 	self.m_OnWebUIUpdateEvent = Events:Subscribe('CT:SetKeyboard', self, self.OnSetKeyboard)
 end
@@ -76,6 +75,7 @@ end
 function MapEditorClient:OnLoaded()
 	WebUI:Init()
 	WebUI:Show()
+	m_CinematicTools:OnLoaded()
 end
 function MapEditorClient:OnPartitionLoaded(p_Partition)
 	m_InstanceParser:OnPartitionLoaded(p_Partition)
@@ -91,8 +91,9 @@ function MapEditorClient:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 	m_Freecam:OnUpdateInputHook(p_Hook, p_Cache, p_DeltaTime)
 end
 
-function MapEditorClient:OnUpdateInput(p_Delta)
+function MapEditorClient:OnUpdateInput(p_Delta, p_SimulationDelta)
 	m_Freecam:OnUpdateInput(p_Delta)
+	m_CinematicTools:OnUpdateInput(p_Delta, p_SimulationDelta)
 	m_UIManager:OnUpdateInput(p_Delta)
 end
 function MapEditorClient:OnUpdatePass(p_Delta, p_Pass)
@@ -137,14 +138,6 @@ end
 
 function MapEditorClient:OnSetKeyboard(p_Value)
 	m_CinematicTools:OnSetKeyboard(p_Value)
-end
-
-function MapEditorClient:OnLoaded()
-	m_CinematicTools:OnLoaded()
-end
-
-function MapEditorClient:OnUpdateInput(p_Delta, p_SimulationDelta)
-	m_CinematicTools:OnUpdateInput(p_Delta, p_SimulationDelta)
 end
 
 function MapEditorClient:LoadPreset(p_Preset, p_LerpTime)
@@ -194,12 +187,6 @@ end
 function MapEditorClient:OnUpdateValue(p_Contents, p_LerpTime)
 	m_CinematicTools:OnUpdateValue(p_Contents, p_LerpTime)
 end
-
-function MapEditorClient:OnUpdateValue(p_Contents, p_LerpTime)
-	m_CinematicTools:OnUpdateValue(p_Contents, p_LerpTime)
-end
-
-
 
 
 return MapEditorClient()
