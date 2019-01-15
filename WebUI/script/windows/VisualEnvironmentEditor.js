@@ -79,12 +79,10 @@ class VisualEnvironmentEditor {
             "Vignette",
             "Wind"
         ];
-        if (useLegacyCategoryControlLogic===false){
-            // In this case, we're not using the Lua client logic to add supportCategories to categoryOptions in-game
-            // Append supportedCategories to categoryOptions
-            categoryOptions.push.apply(categoryOptions, supportedCategories);
-        }
-        let categoryControl = GetCategoryControl(useLegacyCategoryControlLogic);
+
+        // Append supportedCategories to categoryOptions
+        categoryOptions.push.apply(categoryOptions, supportedCategories);
+        let categoryControl = GetCategoryControl();
 
         content.append(categoryControl);
 
@@ -102,67 +100,31 @@ class VisualEnvironmentEditor {
 //		this.category = categorySelect;
 		this.category = categoryControl;
 
-        function GetCategoryControl(useLegacyCategoryControlLogic=true){
+        function GetCategoryControl(){
             // This is a placeholder function to be used while we get the categoryControl logic working
-            let categoryControl = null;
-            if (useLegacyCategoryControlLogic !== true){
-                categoryControl = $(document.createElement("div"));
-                categoryControl.addClass("category");
+            let categoryControl = $(document.createElement("ul"));
+            categoryControl.attr({
+                "id": "tabs"
+            });
+            let infoTab = $(document.createElement("li"));
+            let infoTabLink = $(document.createElement("a"));
+            infoTabLink.attr({
+                "href": "#Info",
+            });
+            infoTabLink.text("Info");
+            infoTab.append(infoTabLink);
 
-                let categoryLabel = $(document.createElement("label"));
-                categoryLabel.attr("for", "objectCategory");
-                categoryLabel.text("Category");
-                categoryControl.append(categoryLabel);
+            let presetsTab = $(document.createElement("li"));
+            let presetsTabLink = $(document.createElement("a"));
+            presetsTabLink.attr({
+                "href": "#Presets",
+                "onclick": "UpdateCurrentPreset()",
+            });
+            presetsTabLink.text("Presets");
+            presetsTab.append(presetsTabLink);
 
-
-                let categorySelect = $(document.createElement("select"));
-                categoryControl.append(categorySelect);
-                categorySelect.attr({
-                    "id": "objectCategory",
-                    "type": "select",
-                    "value": "category"
-                });
-
-                // optionLabel will be the category name passed to getControlGroupMap()
-                let optionLabel = null;
-                for(let i = 0; i < categoryOptions.length; i++){
-                    let option = document.createElement("option");
-
-                    optionLabel = categoryOptions[i];
-                    option.value = optionLabel;
-                    if (optionLabel == null){
-                        option.value = (i+1).toString();
-                        optionLabel = "sample" + option.value;
-                    }
-                    option.innerHTML = optionLabel;
-                    categorySelect.append(option);
-                }
-            }
-            else {
-                categoryControl = $(document.createElement("ul"));
-                categoryControl.attr({
-                    "id": "tabs"
-                });
-                let infoTab = $(document.createElement("li"));
-                let infoTabLink = $(document.createElement("a"));
-                infoTabLink.attr({
-                    "href": "#Info",
-                });
-                infoTabLink.text("Info");
-                infoTab.append(infoTabLink);
-
-                let presetsTab = $(document.createElement("li"));
-                let presetsTabLink = $(document.createElement("a"));
-                presetsTabLink.attr({
-                    "href": "#Presets",
-                    "onclick": "UpdateCurrentPreset()",
-                });
-                presetsTabLink.text("Presets");
-                presetsTab.append(presetsTabLink);
-
-                categoryControl.append(infoTab);
-                categoryControl.append(presetsTab);
-            }
+            categoryControl.append(infoTab);
+            categoryControl.append(presetsTab);
 
             return categoryControl;
         }
@@ -341,26 +303,15 @@ class VisualEnvironmentEditor {
             allTabContent.filter(selectedTab).show();
 		}
 
-        if (useLegacyCategoryControlLogic !== true) {
-            $(document).on("change", "#objectCategory", function(event){
-                // $this is the categorySelect element that fired the change event
-                let $this = this;
-                let newCategoryName = $this.value;
-                UpdateCategoryControlGroup(newCategoryName);
-                if (editor.selectionGroup.children.length === 0){ return;}
-                editor.execute(new SetObjectNameCommand(editor.selectionGroup.children[0].guid, newCategoryName));
-            });
-        }
-        else {
-            $(document).on("click", "ul#tabs li a", function(event){
-                // $this is the categorySelect element that fired the change event
-                let $this = this;
-                let newCategoryName = $this.text;
-                UpdateCategoryControlGroup(newCategoryName);
-                if (editor.selectionGroup.children.length === 0){ return;}
-                editor.execute(new SetObjectNameCommand(editor.selectionGroup.children[0].guid, newCategoryName));
-            });
-        }
+
+        $(document).on("click", "ul#tabs li a", function(event){
+            // $this is the categorySelect element that fired the change event
+            let $this = this;
+            let newCategoryName = $this.text;
+            UpdateCategoryControlGroup(newCategoryName);
+            if (editor.selectionGroup.children.length === 0){ return;}
+            editor.execute(new SetObjectNameCommand(editor.selectionGroup.children[0].guid, newCategoryName));
+        });
 
 		this.dom = content;
 	}
