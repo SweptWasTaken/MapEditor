@@ -157,10 +157,20 @@ class VisualEnvironmentEditor {
             let presetHolder = $(document.createElement("div"));
             presetHolder.attr({"id": "presetHolder"});
 
+            let savedPresetHolder = $(document.createElement("div"));
+            savedPresetHolder.attr({"id": "savedPresetHolder"});
+            savedPresetHolder.text("TODO: List the saved presets here!");
+
+            let pendingPresetHolder = $(document.createElement("div"));
+            pendingPresetHolder.attr({
+            "id": "pendingPresetHolder",
+            "hidden": true
+            });
+
             let presetNameLabel = $(document.createElement("label"));
             presetNameLabel.attr({"for": "PresetName"});
             presetNameLabel.text("Preset Name:");
-            presetHolder.append(presetNameLabel);
+            pendingPresetHolder.append(presetNameLabel);
 
 
             let presetNameInput = $(document.createElement("input"));
@@ -169,12 +179,12 @@ class VisualEnvironmentEditor {
                 "type": "text",
                 "value": "CustomPreset"
             });
-            presetHolder.append(presetNameInput);
+            pendingPresetHolder.append(presetNameInput);
 
             let presetPriorityLabel = $(document.createElement("label"));
             presetPriorityLabel.attr({"for": "PresetPriority"});
             presetPriorityLabel.text("Priority (Higher are loaded last):");
-            presetHolder.append(presetPriorityLabel);
+            pendingPresetHolder.append(presetPriorityLabel);
 
 
             let presetPriorityInput = $(document.createElement("input"));
@@ -183,7 +193,15 @@ class VisualEnvironmentEditor {
                 "type": "number",
                 "value": "0"
             });
-            presetHolder.append(presetPriorityInput);
+            pendingPresetHolder.append(presetPriorityInput);
+
+            let savePendingPresetButton = $(document.createElement("button"));
+            savePendingPresetButton.attr({
+                "id": "SavePendingPresetButton",
+                "onclick": "console.log('SavePendingPresetButton clicked.  Add the new Preset to the savedPresetHolder.'); $('#pendingPresetHolder').hide();"
+            });
+            savePendingPresetButton.text("Save Preset");
+            pendingPresetHolder.append(savePendingPresetButton);
 
             let currentStateHolder = $(document.createElement("div"));
             currentStateHolder.attr({"id": "CurrentStateHolder"});
@@ -229,6 +247,17 @@ class VisualEnvironmentEditor {
                 "readonly": "readonly",
             });
             currentStateHolder.append(currentStateTextArea);
+
+            let addPresetButton = $(document.createElement("button"));
+            addPresetButton.attr({
+                "id": "AddPreset",
+                "onclick": "console.log('AddPresetButton clicked.'); $('#pendingPresetHolder').show();"
+            });
+            addPresetButton.text("+ Add Preset");
+            currentStateHolder.append(addPresetButton);
+
+            presetHolder.append(savedPresetHolder);
+            presetHolder.append(pendingPresetHolder);
             tabContent.append(presetHolder);
             tabContent.append(currentStateHolder);
 
