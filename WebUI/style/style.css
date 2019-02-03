@@ -480,6 +480,10 @@ tr i {
 	padding-bottom: 40px;
 }
 
+#objectVisualEnvironmentEditor > * {
+    margin: 20px 0px;
+}
+
 #objectVisualEnvironmentEditor .category-control-group {
     padding-top: 20px;
 }

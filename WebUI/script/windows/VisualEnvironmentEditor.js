@@ -56,7 +56,12 @@ class VisualEnvironmentEditor {
         content.append(opacitySlider);
         // Use the legacy category control logic for testing the legacy UI (i.e. tab-based) method of category selection
         let useLegacyCategoryControlLogic = true;
-        let categoryOptions = ["Info", "Presets"];
+
+        let presetSelector = GetPresetSelector();
+
+        content.append(presetSelector);
+
+        let categoryOptions = ["Info", /*"Presets"*/];
         let supportedCategories = [
             "CameraParams",
             "CharacterLighting",
@@ -90,7 +95,8 @@ class VisualEnvironmentEditor {
 
         categoryControlGroup.attr({
             "id": "content",
-            "class": "category-control-group ui-widget-content"
+            "class": "category-control-group ui-widget-content",
+            "hidden": true
         });
 
         InitCategoryControlGroup();
@@ -100,12 +106,62 @@ class VisualEnvironmentEditor {
 //		this.category = categorySelect;
 		this.category = categoryControl;
 
+        function GetPresetSelector(){
+            let presetSelector = $(document.createElement("ul"));
+            presetSelector.attr({
+                "id": "savedPresets"
+            });
+            let placeholderPresetCount = 3;
+            for (var i=0; i< placeholderPresetCount; i++) {
+                console.log("creating preset placeholder");
+                let placeholderPresetName = "PresetName{0}".format(i+1);
+                let placeholderPresetPriority = placeholderPresetCount - i;
+
+                let presetPlaceholderTab = $(document.createElement("li"));
+                let presetPlaceholderTabLink = $(document.createElement("a"));
+                presetPlaceholderTabLink.attr({
+                    "href": "#{0}".format(placeholderPresetCount),
+                    "onclick": "console.log('{0} clicked. Load its data.'); $('#content, #tabs').show();".format(placeholderPresetName),
+                });
+                presetPlaceholderTabLink.text("{0} {1}".format(placeholderPresetPriority, placeholderPresetName));
+                presetPlaceholderTab.append(presetPlaceholderTabLink);
+                presetSelector.append(presetPlaceholderTab);
+                console.log("created preset placeholder");
+            }
+
+            let presetsTabContent = GetPresetsTabContent();
+            presetSelector.append(presetsTabContent);
+
+            let addPresetButton = $(document.createElement("button"));
+            addPresetButton.attr({
+                "id": "AddPreset",
+                "onclick": "console.log('AddPresetButton clicked.'); $('#Presets').show();"
+            });
+            addPresetButton.text("+ Add Preset");
+            presetSelector.append(addPresetButton);
+
+//            let presetsTab = $(document.createElement("li"));
+//            let presetsTabLink = $(document.createElement("a"));
+//            presetsTabLink.attr({
+//                "href": "#Presets",
+//                "onclick": "UpdateCurrentPreset()",
+//            });
+//            presetsTabLink.text("Presets");
+//            presetsTab.append(presetsTabLink);
+//            categoryControl.append(presetsTab);
+
+            return presetSelector;
+        }
+
         function GetCategoryControl(){
             // This is a placeholder function to be used while we get the categoryControl logic working
+
             let categoryControl = $(document.createElement("ul"));
             categoryControl.attr({
-                "id": "tabs"
+                "id": "tabs",
+                "hidden": true
             });
+
             let infoTab = $(document.createElement("li"));
             let infoTabLink = $(document.createElement("a"));
             infoTabLink.attr({
@@ -114,17 +170,19 @@ class VisualEnvironmentEditor {
             infoTabLink.text("Info");
             infoTab.append(infoTabLink);
 
-            let presetsTab = $(document.createElement("li"));
-            let presetsTabLink = $(document.createElement("a"));
-            presetsTabLink.attr({
-                "href": "#Presets",
-                "onclick": "UpdateCurrentPreset()",
-            });
-            presetsTabLink.text("Presets");
-            presetsTab.append(presetsTabLink);
+            // Commenting out presetsTab for now, while it is being migrated to the savedPresets containing.
+            // Delete this code after it has been successfully migrated.
+//            let presetsTab = $(document.createElement("li"));
+//            let presetsTabLink = $(document.createElement("a"));
+//            presetsTabLink.attr({
+//                "href": "#Presets",
+//                "onclick": "UpdateCurrentPreset()",
+//            });
+//            presetsTabLink.text("Presets");
+//            presetsTab.append(presetsTabLink);
 
             categoryControl.append(infoTab);
-            categoryControl.append(presetsTab);
+//            categoryControl.append(presetsTab);
 
             return categoryControl;
         }
@@ -152,25 +210,23 @@ class VisualEnvironmentEditor {
 
         function GetPresetsTabContent(){
             let tabContent = $(document.createElement("div"));
-		    tabContent.attr({"id": "Presets"});
+		    tabContent.attr({
+		    "id": "Presets",
+		    "hidden": true
+		    });
 
             let presetHolder = $(document.createElement("div"));
             presetHolder.attr({"id": "presetHolder"});
 
-            let savedPresetHolder = $(document.createElement("div"));
-            savedPresetHolder.attr({"id": "savedPresetHolder"});
-            savedPresetHolder.text("TODO: List the saved presets here!");
-
-            let pendingPresetHolder = $(document.createElement("div"));
-            pendingPresetHolder.attr({
-            "id": "pendingPresetHolder",
-            "hidden": true
+            presetHolder.attr({
+            "id": "PresetHolder",
+//            "hidden": true
             });
 
             let presetNameLabel = $(document.createElement("label"));
             presetNameLabel.attr({"for": "PresetName"});
             presetNameLabel.text("Preset Name:");
-            pendingPresetHolder.append(presetNameLabel);
+            presetHolder.append(presetNameLabel);
 
 
             let presetNameInput = $(document.createElement("input"));
@@ -179,12 +235,12 @@ class VisualEnvironmentEditor {
                 "type": "text",
                 "value": "CustomPreset"
             });
-            pendingPresetHolder.append(presetNameInput);
+            presetHolder.append(presetNameInput);
 
             let presetPriorityLabel = $(document.createElement("label"));
             presetPriorityLabel.attr({"for": "PresetPriority"});
             presetPriorityLabel.text("Priority (Higher are loaded last):");
-            pendingPresetHolder.append(presetPriorityLabel);
+            presetHolder.append(presetPriorityLabel);
 
 
             let presetPriorityInput = $(document.createElement("input"));
@@ -193,15 +249,15 @@ class VisualEnvironmentEditor {
                 "type": "number",
                 "value": "0"
             });
-            pendingPresetHolder.append(presetPriorityInput);
+            presetHolder.append(presetPriorityInput);
 
             let savePendingPresetButton = $(document.createElement("button"));
             savePendingPresetButton.attr({
                 "id": "SavePendingPresetButton",
-                "onclick": "console.log('SavePendingPresetButton clicked.  Add the new Preset to the savedPresetHolder.'); $('#pendingPresetHolder').hide();"
+                "onclick": "console.log('SavePendingPresetButton clicked.  Add the new Preset to the savedPresetHolder.'); $('#Presets').hide();"
             });
             savePendingPresetButton.text("Save Preset");
-            pendingPresetHolder.append(savePendingPresetButton);
+            presetHolder.append(savePendingPresetButton);
 
             let currentStateHolder = $(document.createElement("div"));
             currentStateHolder.attr({"id": "CurrentStateHolder"});
@@ -248,16 +304,6 @@ class VisualEnvironmentEditor {
             });
             currentStateHolder.append(currentStateTextArea);
 
-            let addPresetButton = $(document.createElement("button"));
-            addPresetButton.attr({
-                "id": "AddPreset",
-                "onclick": "console.log('AddPresetButton clicked.'); $('#pendingPresetHolder').show();"
-            });
-            addPresetButton.text("+ Add Preset");
-            currentStateHolder.append(addPresetButton);
-
-            presetHolder.append(savedPresetHolder);
-            presetHolder.append(pendingPresetHolder);
             tabContent.append(presetHolder);
             tabContent.append(currentStateHolder);
 
