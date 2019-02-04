@@ -121,7 +121,7 @@ class VisualEnvironmentEditor {
                 let presetPlaceholderTabLink = $(document.createElement("a"));
                 presetPlaceholderTabLink.attr({
                     "href": "#{0}".format(placeholderPresetCount),
-                    "onclick": "console.log('{0} clicked. Load its data.'); $('#content, #tabs').show();".format(placeholderPresetName),
+                    "onclick": "console.log('{0} clicked. Load its data.'); $('#content, #tabs').show();  $('#savedPresets').hide(); $('#currentPreset').text('{1} ↑');".format(placeholderPresetName, placeholderPresetName),
                 });
                 presetPlaceholderTabLink.text("{0} {1}".format(placeholderPresetPriority, placeholderPresetName));
                 presetPlaceholderTab.append(presetPlaceholderTabLink);
@@ -161,6 +161,13 @@ class VisualEnvironmentEditor {
                 "id": "tabs",
                 "hidden": true
             });
+
+            let currentPreset = $(document.createElement("div"));
+            currentPreset.attr({
+                "id": "currentPreset",
+                "onclick": "$('#tabs, #content').hide();  $('#savedPresets').show();",
+            });
+            categoryControl.append(currentPreset);
 
             let infoTab = $(document.createElement("li"));
             let infoTabLink = $(document.createElement("a"));
