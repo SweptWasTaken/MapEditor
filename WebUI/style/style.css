@@ -533,3 +533,13 @@ tr i {
 label[type="NotSupported"] {
     color:#c1c1c1;
 }
+
+#savedPresets li {
+	margin: 10px;
+}
+
+#AddPreset {
+	margin: 10px;
+	position: absolute;
+	bottom: 0px;
+}

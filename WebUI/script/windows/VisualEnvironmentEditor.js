@@ -33,27 +33,6 @@ class VisualEnvironmentEditor {
 	    let content = $(document.createElement("div"));
 		content.attr("id", "objectVisualEnvironmentEditor");
 
-
-		let opacitySlider = $(document.createElement("div"));
-        opacitySlider.attr({
-            "id": "slider",
-            "data-wjs-element": "box",
-            "step": "0.0001"
-        });
-
-        //Step 1: set up the slider with some options. The valid values for opacity are 0 to 1
-        //Step 2: Bind an event so when you slide the slider and stop, the following function gets called
-        opacitySlider.slider({
-            min: 0.1,
-            max: 1,
-            step: 0.01,
-            value: 1,
-            slide: function(e,ui){
-                $('#objectVisualEnvironmentEditor').css('opacity', ui.value)
-
-            }
-        });
-        content.append(opacitySlider);
         // Use the legacy category control logic for testing the legacy UI (i.e. tab-based) method of category selection
         let useLegacyCategoryControlLogic = true;
 
@@ -121,7 +100,7 @@ class VisualEnvironmentEditor {
                 let presetPlaceholderTabLink = $(document.createElement("a"));
                 presetPlaceholderTabLink.attr({
                     "href": "#{0}".format(placeholderPresetCount),
-                    "onclick": "console.log('{0} clicked. Load its data.'); $('#content, #tabs').show();  $('#savedPresets').hide(); $('#currentPreset').text('{1} ↑');".format(placeholderPresetName, placeholderPresetName),
+                    "onclick": "console.log('{0} clicked. Load its data.'); $('#content, #tabs').show();  $('#savedPresets').hide(); $('#presetsView').text('{1}');".format(placeholderPresetName, placeholderPresetName),
                 });
                 presetPlaceholderTabLink.text("{0} {1}".format(placeholderPresetPriority, placeholderPresetName));
                 presetPlaceholderTab.append(presetPlaceholderTabLink);
@@ -162,11 +141,34 @@ class VisualEnvironmentEditor {
                 "hidden": true
             });
 
-            let currentPreset = $(document.createElement("div"));
+            let currentPreset = $(document.createElement("li"));
             currentPreset.attr({
                 "id": "currentPreset",
+            });
+            let presetsBreadcrumbs = $(document.createElement("div"));
+            presetsBreadcrumbs.attr({
+                "id": "presetsBreadcrumbs",
+            });
+            let presetsOverview = $(document.createElement("a"));
+            presetsOverview.attr({
+                "id": "presetsOverview",
                 "onclick": "$('#tabs, #content').hide();  $('#savedPresets').show();",
             });
+            presetsOverview.text('Presets');
+            let presetsBreadcrumbsSeparator = $(document.createElement("span"));
+            presetsBreadcrumbsSeparator.attr({
+                "class": "presetsBreadcrumbsSeparator",
+
+            });
+            presetsBreadcrumbsSeparator.text(' / ');
+            let presetsView = $(document.createElement("a"));
+            presetsView.attr({
+                "id": "presetsView",
+            });
+            presetsBreadcrumbs.append(presetsOverview);
+            presetsBreadcrumbs.append(presetsBreadcrumbsSeparator);
+            presetsBreadcrumbs.append(presetsView);
+            currentPreset.append(presetsBreadcrumbs);
             categoryControl.append(currentPreset);
 
             let infoTab = $(document.createElement("li"));
@@ -199,7 +201,7 @@ class VisualEnvironmentEditor {
 		    tabContent.attr({"id": "Info"});
 
 		    let placholderText = $(document.createElement("div"));
-            placholderText.text("CinematicTools Yo");
+            placholderText.text("ToDo list for CinematicTools Yo");
 
             let fieldTestHolder = $(document.createElement("div"));
             let p_Class = 'testClass';
