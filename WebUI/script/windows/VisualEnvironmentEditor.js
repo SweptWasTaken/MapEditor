@@ -33,6 +33,9 @@ class VisualEnvironmentEditor {
 	    let content = $(document.createElement("div"));
 		content.attr("id", "objectVisualEnvironmentEditor");
 
+		let presetsBreadcrumbs = GetPresetBreadcrumbs();
+        content.append(presetsBreadcrumbs);
+
         // Use the legacy category control logic for testing the legacy UI (i.e. tab-based) method of category selection
         let useLegacyCategoryControlLogic = true;
 
@@ -85,6 +88,49 @@ class VisualEnvironmentEditor {
 //		this.category = categorySelect;
 		this.category = categoryControl;
 
+		function GetPresetBreadcrumbs(){
+		    let presetsBreadcrumbs = $(document.createElement("div"));
+            presetsBreadcrumbs.attr({
+                "id": "presetsBreadcrumbs",
+            });
+            let presetsOverview = $(document.createElement("a"));
+            presetsOverview.attr({
+                "id": "presetsOverview",
+                "onclick": "$('#tabs, #content, #presetsView, .presetsBreadcrumbsSeparator, #componentView').hide();  $('#savedPresets').show();",
+            });
+            presetsOverview.text('Presets');
+            let presetsBreadcrumbsSeparator1 = $(document.createElement("span"));
+            presetsBreadcrumbsSeparator1.attr({
+                "id": "presetsBreadcrumbsSeparator1",
+                "class": "presetsBreadcrumbsSeparator",
+                "style": "display:none;"
+            });
+            presetsBreadcrumbsSeparator1.text(' / ');
+            let presetsView = $(document.createElement("a"));
+            presetsView.attr({
+                "id": "presetsView",
+                "onclick": "$('#content, #presetsBreadcrumbsSeparator2, #componentView').hide(); $('#presetsView, #tabs').show();",
+            });
+            let presetsBreadcrumbsSeparator2 = $(document.createElement("span"));
+            presetsBreadcrumbsSeparator2.attr({
+                "id": "presetsBreadcrumbsSeparator2",
+                "class": "presetsBreadcrumbsSeparator",
+                "style": "display:none;"
+            });
+            presetsBreadcrumbsSeparator2.text(' / ');
+            let componentView = $(document.createElement("a"));
+            componentView.attr({
+                "id": "componentView",
+            });
+            presetsBreadcrumbs.append(presetsOverview);
+            presetsBreadcrumbs.append(presetsBreadcrumbsSeparator1);
+            presetsBreadcrumbs.append(presetsView);
+            presetsBreadcrumbs.append(presetsBreadcrumbsSeparator2);
+            presetsBreadcrumbs.append(componentView);
+
+            return presetsBreadcrumbs;
+        }
+
         function GetPresetSelector(){
             let presetSelector = $(document.createElement("ul"));
             presetSelector.attr({
@@ -100,17 +146,15 @@ class VisualEnvironmentEditor {
                 let presetPlaceholderTabLink = $(document.createElement("a"));
                 presetPlaceholderTabLink.attr({
                     "href": "#{0}".format(placeholderPresetCount),
-                    "onclick": "console.log('{0} clicked. Load its data.'); $('#content, #tabs').show();  $('#savedPresets').hide(); $('#presetsView').text('{1}');".format(placeholderPresetName, placeholderPresetName),
+                    "onclick": "console.log('{0} clicked. Load its data.'); $('#presetsView').text('{1}'); $('#tabs, #presetsBreadcrumbsSeparator1, #presetsView').show();  $('#savedPresets, #content').hide();".format(placeholderPresetName, placeholderPresetName),
                 });
                 presetPlaceholderTabLink.text("{0} {1}".format(placeholderPresetPriority, placeholderPresetName));
                 presetPlaceholderTab.append(presetPlaceholderTabLink);
                 presetSelector.append(presetPlaceholderTab);
                 console.log("created preset placeholder");
             }
-
             let presetsTabContent = GetPresetsTabContent();
             presetSelector.append(presetsTabContent);
-
             let addPresetButton = $(document.createElement("button"));
             addPresetButton.attr({
                 "id": "AddPreset",
@@ -118,7 +162,6 @@ class VisualEnvironmentEditor {
             });
             addPresetButton.text("+ Add Preset");
             presetSelector.append(addPresetButton);
-
 //            let presetsTab = $(document.createElement("li"));
 //            let presetsTabLink = $(document.createElement("a"));
 //            presetsTabLink.attr({
@@ -145,30 +188,7 @@ class VisualEnvironmentEditor {
             currentPreset.attr({
                 "id": "currentPreset",
             });
-            let presetsBreadcrumbs = $(document.createElement("div"));
-            presetsBreadcrumbs.attr({
-                "id": "presetsBreadcrumbs",
-            });
-            let presetsOverview = $(document.createElement("a"));
-            presetsOverview.attr({
-                "id": "presetsOverview",
-                "onclick": "$('#tabs, #content').hide();  $('#savedPresets').show();",
-            });
-            presetsOverview.text('Presets');
-            let presetsBreadcrumbsSeparator = $(document.createElement("span"));
-            presetsBreadcrumbsSeparator.attr({
-                "class": "presetsBreadcrumbsSeparator",
 
-            });
-            presetsBreadcrumbsSeparator.text(' / ');
-            let presetsView = $(document.createElement("a"));
-            presetsView.attr({
-                "id": "presetsView",
-            });
-            presetsBreadcrumbs.append(presetsOverview);
-            presetsBreadcrumbs.append(presetsBreadcrumbsSeparator);
-            presetsBreadcrumbs.append(presetsView);
-            currentPreset.append(presetsBreadcrumbs);
             categoryControl.append(currentPreset);
 
             let infoTab = $(document.createElement("li"));
@@ -392,6 +412,7 @@ class VisualEnvironmentEditor {
             // $this is the categorySelect element that fired the change event
             let $this = this;
             let newCategoryName = $this.text;
+            $('#content, #presetsBreadcrumbsSeparator2, #componentView').show();  $('#savedPresets, #tabs').hide();  $('#componentView').text(newCategoryName);
             UpdateCategoryControlGroup(newCategoryName);
             if (editor.selectionGroup.children.length === 0){ return;}
             editor.execute(new SetObjectNameCommand(editor.selectionGroup.children[0].guid, newCategoryName));

@@ -480,8 +480,18 @@ tr i {
 	padding-bottom: 40px;
 }
 
+#objectVisualEnvironmentEditor {
+	padding-top: 10px;
+	height: 100%;
+	overflow-y: scroll;
+}
+
 #objectVisualEnvironmentEditor > * {
-    margin: 20px 0px;
+    /*margin: 20px 0px;*/
+}
+
+#presetsBreadcrumbs, #savedPresets, #tabs, #content {
+	padding: 10px;
 }
 
 #objectVisualEnvironmentEditor .category-control-group {
@@ -535,11 +545,19 @@ label[type="NotSupported"] {
 }
 
 #savedPresets li {
-	margin: 10px;
+	padding: 10px 0px;
 }
 
 #AddPreset {
 	margin: 10px;
 	position: absolute;
 	bottom: 0px;
+}
+
+#Presets > #PresetHolder, #Presets > #CurrentStateHolder {
+    margin: 10px;
+}
+
+#presetsOverview, #presetsView {
+	cursor: pointer;
 }
