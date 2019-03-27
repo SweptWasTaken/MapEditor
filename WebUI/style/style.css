@@ -484,6 +484,13 @@ tr i {
 	padding-top: 10px;
 	height: 100%;
 	overflow-y: scroll;
+	scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+
+#objectVisualEnvironmentEditor::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
 }
 
 #objectVisualEnvironmentEditor > * {
