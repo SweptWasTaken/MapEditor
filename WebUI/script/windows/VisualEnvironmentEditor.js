@@ -344,7 +344,7 @@ class VisualEnvironmentEditor {
 		    This function returns the content for the selected category option
 		    */
 
-		    let controlGroupContent = "TODO: Display category control group for the {0} category";
+		    let controlGroupContent = "";
 		    let controlGroupMap = new Map([
 		        ["Info", GetInfoTabContent],
 		        ["Presets", GetPresetsTabContent]
@@ -358,10 +358,11 @@ class VisualEnvironmentEditor {
 		        }
 		    }
 		    else {
+		        // Display category control group for the category
 		        if (category === null) {
                     category = "selected";
                 }
-                controlGroupContent = controlGroupContent.format(category);
+                // controlGroupContent = controlGroupContent.format(category);
                 let tabContent = $(document.createElement("div"));
                 tabContent.attr({"id": category});
 

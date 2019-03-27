@@ -568,3 +568,11 @@ label[type="NotSupported"] {
 #presetsOverview, #presetsView {
 	cursor: pointer;
 }
+
+#tabs li {
+    margin: 10px 0px;
+}
+
+#objectVisualEnvironmentEditor a {
+    color: inherit;
+}
