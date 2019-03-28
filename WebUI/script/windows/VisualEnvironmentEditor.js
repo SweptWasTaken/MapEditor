@@ -679,7 +679,7 @@ function CreateFloat(p_Class, p_Field, p_Type, p_Value) {
     s_Slider.appendChild(s_Display);
 
     $(s_Slider).slider({
-        range: "max",
+        range: "min",
         min: GetSliderMin(parseFloat(p_Value)),
         max: GetSliderMax(parseFloat(p_Value)),
         value: parseFloat(p_Value),
@@ -873,13 +873,12 @@ $(document).on('contextmenu', '.ui-slider-handle', function() {
 
     var s_Parent = $(this).parent();
     var s_Value = s_Parent.slider("value");
-    $(s_Parent).attr("value", s_Value);
-    $(s_Parent).attr("type", "number");
+    s_Parent.attr("value", s_Value);
+    s_Parent.attr("type", "number");
     s_Parent.slider("destroy");
     s_Parent.changeElementType("input");
-
-    currentFocus = $("#" + s_Class + " #" + s_Key + " input");
-
+    // currentFocus = $("#" + s_Class + " #" + s_Key + " input");
+    currentFocus = s_Parent;
     currentFocus.focus();
     currentFocus.select();
     SetKeyboard("true");
@@ -894,7 +893,7 @@ function SetToSlider(p_Element) {
     var s_Max = $(p_Element).attr("max");
     var s_Element = $(p_Element).changeElementType("div");
     $(s_Element).slider({
-        range: "max",
+        range: "min",
         min: GetSliderMin(parseFloat(s_Val)),
         max: GetSliderMax(parseFloat(s_Val)),
         value: parseFloat(s_Val),
