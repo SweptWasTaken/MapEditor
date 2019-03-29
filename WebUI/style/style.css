@@ -484,13 +484,15 @@ tr i {
 	padding-top: 10px;
 	height: 100%;
 	overflow-y: scroll;
-	scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* IE 10+ */
+	/* Uncomment below to hide scrollbar */
+	/*scrollbar-width: none; !* Firefox *!*/
+    /*-ms-overflow-style: none;  !* IE 10+ *!*/
 }
 
 #objectVisualEnvironmentEditor::-webkit-scrollbar { /* WebKit */
-    width: 0;
-    height: 0;
+    /* Uncomment below to hide scrollbar */
+	/*width: 0;*/
+    /*height: 0;*/
 }
 
 #objectVisualEnvironmentEditor > * {
@@ -555,7 +557,11 @@ label[type="NotSupported"] {
 	padding: 10px 0px;
 }
 
-#AddPreset {
+#presetButtonContainer {
+    margin-top: 10px;
+}
+
+#presetButtonContainer, #EditPreset {
 	margin: 10px;
 	position: absolute;
 	bottom: 0px;
@@ -575,4 +581,8 @@ label[type="NotSupported"] {
 
 #objectVisualEnvironmentEditor a {
     color: inherit;
+}
+
+#savedPresets li a, #tabs li a {
+    text-decoration-line: unset;
 }

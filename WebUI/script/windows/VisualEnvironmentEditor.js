@@ -96,9 +96,18 @@ class VisualEnvironmentEditor {
             let presetsOverview = $(document.createElement("a"));
             presetsOverview.attr({
                 "id": "presetsOverview",
-                "onclick": "$('#tabs, #content, #presetsView, .presetsBreadcrumbsSeparator, #componentView').hide();  $('#savedPresets').show();",
             });
             presetsOverview.text('Presets');
+            $(document).on('click', '#presetsOverview', function(){
+                $('#savedPresets, #tabs, #content, #presetsView, .presetsBreadcrumbsSeparator, #componentView').hide();
+                if ($(this).hasClass('editingPresets')){
+                    $('#savedPresets').show();
+                }
+                else {
+                    $('#tabs').show();
+                }
+
+            });
             let presetsBreadcrumbsSeparator1 = $(document.createElement("span"));
             presetsBreadcrumbsSeparator1.attr({
                 "id": "presetsBreadcrumbsSeparator1",
@@ -134,7 +143,8 @@ class VisualEnvironmentEditor {
         function GetPresetSelector(){
             let presetSelector = $(document.createElement("ul"));
             presetSelector.attr({
-                "id": "savedPresets"
+                "id": "savedPresets",
+                "hidden": true
             });
             let placeholderPresetCount = 3;
             for (var i=0; i< placeholderPresetCount; i++) {
@@ -146,7 +156,7 @@ class VisualEnvironmentEditor {
                 let presetPlaceholderTabLink = $(document.createElement("a"));
                 presetPlaceholderTabLink.attr({
                     "href": "#{0}".format(placeholderPresetCount),
-                    "onclick": "console.log('{0} clicked. Load its data.'); $('#presetsView').text('{1}'); $('#tabs, #presetsBreadcrumbsSeparator1, #presetsView').show();  $('#savedPresets, #content').hide();".format(placeholderPresetName, placeholderPresetName),
+                    "onclick": "console.log('{0} clicked. Load its data.'); $('#presetsView').text('{1}'); $('#tabs, #presetsBreadcrumbsSeparator1, #presetsView').show();  $('#savedPresets, #content, #EditPreset').hide();".format(placeholderPresetName, placeholderPresetName),
                 });
                 presetPlaceholderTabLink.text("{0} {1}".format(placeholderPresetPriority, placeholderPresetName));
                 presetPlaceholderTab.append(presetPlaceholderTabLink);
@@ -154,14 +164,25 @@ class VisualEnvironmentEditor {
                 console.log("created preset placeholder");
             }
             let presetsTabContent = GetPresetsTabContent();
-            presetSelector.append(presetsTabContent);
+            let presetButtonContainer = $(document.createElement("div"));
+            presetButtonContainer.attr({
+                "id": "presetButtonContainer",
+            });
             let addPresetButton = $(document.createElement("button"));
             addPresetButton.attr({
                 "id": "AddPreset",
-                "onclick": "console.log('AddPresetButton clicked.'); $('#Presets').show();"
+                "onclick": "console.log('AddPresetButton clicked.'); $('#Presets').show();",
             });
             addPresetButton.text("+ Add Preset");
-            presetSelector.append(addPresetButton);
+            presetButtonContainer.append(addPresetButton);
+            let closePresetsButton = $(document.createElement("button"));
+            closePresetsButton.attr({
+                "id": "ClosePresets",
+                "onclick": "console.log('ClosePresetButton clicked.'); $('#presetsOverview').toggleClass('editingPresets'); $('#savedPresets').hide(); $('#tabs, #EditPreset').show();",
+            });
+            closePresetsButton.text("Close Saved Presets");
+            presetButtonContainer.append(closePresetsButton);
+            presetSelector.append(presetButtonContainer);
 //            let presetsTab = $(document.createElement("li"));
 //            let presetsTabLink = $(document.createElement("a"));
 //            presetsTabLink.attr({
@@ -181,7 +202,7 @@ class VisualEnvironmentEditor {
             let categoryControl = $(document.createElement("ul"));
             categoryControl.attr({
                 "id": "tabs",
-                "hidden": true
+                // "hidden": true
             });
 
             let currentPreset = $(document.createElement("li"));
@@ -198,6 +219,13 @@ class VisualEnvironmentEditor {
             });
             infoTabLink.text("Info");
             infoTab.append(infoTabLink);
+            let editPresetsButton = $(document.createElement("button"));
+            editPresetsButton.attr({
+                "id": "EditPreset",
+                "onclick": "console.log('EditButton clicked.'); $('#tabs').hide(); $('#presetsOverview').toggleClass('editingPresets'); $('#savedPresets').show();",
+            });
+            editPresetsButton.text("Edit Presets");
+            infoTab.append(editPresetsButton);
 
             // Commenting out presetsTab for now, while it is being migrated to the savedPresets containing.
             // Delete this code after it has been successfully migrated.
@@ -221,18 +249,47 @@ class VisualEnvironmentEditor {
 		    tabContent.attr({"id": "Info"});
 
 		    let placholderText = $(document.createElement("div"));
-            placholderText.text("ToDo list for CinematicTools Yo");
-
-            let fieldTestHolder = $(document.createElement("div"));
-            let p_Class = 'testClass';
-            let p_Field = 'testField';
-            let p_Type = 'testField';
-            let p_Value = 10;
-            let sliderField = CreateFloat(p_Class, p_Field, p_Type, p_Value);
-            fieldTestHolder.append(sliderField);
-
+            placholderText.html("<pre>Controls:\n" +
+                "\n" +
+                "F1 to enable freecam.\n" +
+                "\n" +
+                "Once in freecam, hold right click and:\n" +
+                "\n" +
+                "    F2 to disable freecam and take control of your character again\n" +
+                "    WASD to move camera\n" +
+                "    Mouse to rotate camera\n" +
+                "    Q to move down\n" +
+                "    E to move up\n" +
+                "    Shift to move camera faster\n" +
+                "    Scrollwheel to change camera speed\n" +
+                "    Page up/down to change rotation speed\n" +
+                "\n" +
+                "In freecam, without holding right click:\n" +
+                "\n" +
+                "    CTRL while moving gizmo to snap to grid\n" +
+                "    F to place object where the mouse is at (screen to world)\n" +
+                "    Q to hide gizmo\n" +
+                "    W to change gizmo mode to translate\n" +
+                "    E to change gizmo mode to rotate\n" +
+                "    R to change gizmo mode to scale\n" +
+                "    X to toggle world/local coordinates\n" +
+                "    F3 to reset the camera\n" +
+                "    P to select parent\n" +
+                "    CTRL+D to clone selected entity to the same directory\n" +
+                "    CTRL+SHIFT+D to clone selected entity to the root directory\n" +
+                "    CTRL+C to copy selected entity\n" +
+                "    CTRL+V to paste saved entity to the selected group\n\n" +
+                "ToDo list for CinematicTools Yo</pre>");
+            
             tabContent.append(placholderText);
-            tabContent.append(fieldTestHolder);
+            // let fieldTestHolder = $(document.createElement("div"));
+            // let p_Class = 'testClass';
+            // let p_Field = 'testField';
+            // let p_Type = 'testField';
+            // let p_Value = 10;
+            // let sliderField = CreateFloat(p_Class, p_Field, p_Type, p_Value);
+            // fieldTestHolder.append(sliderField);
+            // tabContent.append(fieldTestHolder);
 
 		    return tabContent;
         }
@@ -404,17 +461,28 @@ class VisualEnvironmentEditor {
             if (newCategoryName === "Presets") {
                 UpdateCurrentPreset();
             }
-            let selectedTab = "#{0}".format(newCategoryName);
-            allTabContent.filter(selectedTab).show();
-		}
+            // let selectedTab = "#{0}".format(newCategoryName);
+            // allTabContent.filter(selectedTab).show();
 
+            let selectedTab = $("#{0}".format(newCategoryName));
+            selectedTab.show();
+            // $('html, body').animate({
+            //     scrollTop: $('#objectVisualEnvironmentEditor').offsetTop //#Scroll to the top of the objectVisualEnvironmentEditor
+            // }, 'slow');
+
+		}
 
         $(document).on("click", "ul#tabs li a", function(event){
             // $this is the categorySelect element that fired the change event
             let $this = this;
             let newCategoryName = $this.text;
-            $('#content, #presetsBreadcrumbsSeparator2, #componentView').show();  $('#savedPresets, #tabs').hide();  $('#componentView').text(newCategoryName);
+            $('#content, #presetsBreadcrumbsSeparator2, #componentView').show();
+            $('#savedPresets, #tabs').hide();
+            $('#componentView').text(newCategoryName);
             UpdateCategoryControlGroup(newCategoryName);
+            // TODO: Scroll the selected tab to the top
+            // $('#objectVisualEnvironmentEditor').scrollTop($('#objectVisualEnvironmentEditor').offset().bottom);
+            // $('#objectVisualEnvironmentEditor').scrollTop(0);
             if (editor.selectionGroup.children.length === 0){ return;}
             editor.execute(new SetObjectNameCommand(editor.selectionGroup.children[0].guid, newCategoryName));
         });
