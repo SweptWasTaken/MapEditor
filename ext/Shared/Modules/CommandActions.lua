@@ -37,7 +37,6 @@ function CommandActions:SpawnBlueprint(p_Command, p_UpdatePass)
 	end
 
 	local s_GameObjectTransferData = p_Command.gameObjectTransferData
-
 	local s_SpawnResult = GameObjectManager:InvokeBlueprintSpawn(s_GameObjectTransferData.guid,
 																p_Command.sender,
 																s_GameObjectTransferData.blueprintCtrRef.partitionGuid,

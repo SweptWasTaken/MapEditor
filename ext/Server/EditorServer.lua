@@ -142,7 +142,7 @@ function EditorServer:OnUpdatePass(p_Delta, p_Pass)
 	if m_IsLevelLoaded then
 		m_LoadDelay = m_LoadDelay + p_Delta
 
-		if m_LoadDelay > 10 then
+		if m_LoadDelay > 50 then
 			m_IsLevelLoaded = false
 			m_LoadDelay = 0
 			self:LoadSave()

@@ -91,7 +91,7 @@ function Editor:OnReceiveUpdate(p_UpdatedGameObjectTransferDatas)
 		else
 			--TODO: handle moving or whatever was done to existing objects
 
-			local s_Changes GetChanges( self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData)
+			local s_Changes = GetChanges( self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData)
 
 			for _, change in ipairs(s_Changes) do
 				local s_Command
@@ -134,7 +134,7 @@ function Editor:OnUpdateTransactionId(p_TransactionId)
 		return
 	end
 
-	--- Desync should only happen when a player first loads in (transactionId is 0), otherwise we fucked up.
+	--- Desync should only happen when a player first loads in (transactionId == 0), otherwise we fucked up.
 	if p_TransactionId ~= self.m_TransactionId and self.m_TransactionId ~= 0 then
 		m_Logger:Warning("Client is desynced, syncing it. This should rarely happen, did the client hung up? network problem? Please report it on the repo.")
 	end

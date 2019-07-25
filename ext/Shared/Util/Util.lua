@@ -222,8 +222,14 @@ function GenerateCustomGuid()
 end
 
 -- Generates a guid based on a given number. Used for vanilla objects.
-function GenerateVanillaGuid(n)
-	return Guid(VANILLA_GUID_PREFIX.."-0000-0000-0000-"..GetFilledNumberAsString(n, 12), "D")
+function GenerateVanillaGuid(n, typeName)
+
+	-- These types are server or client only, we dont use the passed number
+	if typeName == "EffectBlueprint" or typeName == "VisualEnvironmentBlueprint" then
+		return Guid(VANILLA_GUID_PREFIX.."-0000-0000-1111-"..h()..h()..h()..h()..h()..h()), n
+	end
+
+	return Guid(VANILLA_GUID_PREFIX.."-0000-0000-0000-"..GetFilledNumberAsString(n, 12), "D"), n+1
 end
 
 function GetFilledNumberAsString(n, stringLength)

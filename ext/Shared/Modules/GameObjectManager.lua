@@ -10,11 +10,15 @@ end
 
 function GameObjectManager:RegisterVars()
     self.m_VanillaBlueprintNumber = 0
-
+    self.m_LevelLoaded = false
     self.m_GameObjects = {}
     self.m_PendingCustomBlueprintGuids = {}
     self.m_Entities = {}
     self.m_UnresolvedGameObjects = {}
+end
+
+function GameObjectManager:OnLevelLoaded()
+    self.m_LevelLoaded = true
 end
 
 function GameObjectManager:OnLevelDestroy()
@@ -87,11 +91,17 @@ end
 
 function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Transform, p_Variation, p_Parent)
     -- We dont load vanilla objects if the flag is active
-    if not ME_CONFIG.LOAD_VANILLA and self.m_PendingCustomBlueprintGuids[tostring(p_Blueprint.instanceGuid)] == nil then
+    if not ME_CONFIG.LOAD_VANILLA and not self.m_LevelLoaded then
         return
     end
 
-    local s_TempGuid = GenerateTempGuid()
+    local s_Guid
+
+    if not self.m_LevelLoaded then
+        s_Guid, self.m_VanillaBlueprintNumber = GenerateVanillaGuid(self.m_VanillaBlueprintNumber, p_Blueprint.typeInfo.name)
+    else
+        s_Guid = GenerateCustomGuid()
+    end
 
     local s_BlueprintInstanceGuid = tostring(p_Blueprint.instanceGuid)
     local s_BlueprintPartitionGuid = InstanceParser:GetPartition(p_Blueprint.instanceGuid)
@@ -131,20 +141,20 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
                 }
             end
 
-            self.m_Entities[l_Entity.instanceId] = s_TempGuid
+            self.m_Entities[l_Entity.instanceId] = s_Guid
             table.insert(s_GameEntities, s_GameEntity)
         end
     end
 
     local s_Blueprint = Blueprint(p_Blueprint) -- do we need that? for the name?
     local s_GameObject = GameObject{
-        guid = s_TempGuid, -- we set a tempGuid, it will later be set to a vanilla or custom guid
+        guid = s_Guid,
         name = s_Blueprint.name,
         typeName = p_Blueprint.typeInfo.name,
         parentData = GameObjectParentData{},
         transform = p_Transform,
         variation = p_Variation,
-        isVanilla = true,
+        isVanilla = not self.m_LevelLoaded,
         isDeleted = false,
         isEnabled = true,
         gameEntities = s_GameEntities,
@@ -158,13 +168,15 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         instanceGuid = s_BlueprintInstanceGuid
     }
 
+    --m_Logger:Write(self.m_VanillaBlueprintNumber .." - ".. tostring(s_GameObject.guid) .. " - ".. s_Blueprint.name)
+
     self:ResolveChildren(s_GameObject)
 
     if (p_Parent == nil) then -- no parent (custom spawned blueprint) -> proceed in postprocessing
-        m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
+        --m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
         self:PostProcessGameObjectAndChildren(s_GameObject)
     elseif (InstanceParser:GetLevelData(s_ParentPrimaryInstance) ~= nil) then -- top level vanilla (level data) -> proceed in postprocessing
-        m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
+        --m_Logger:Write(">>>> PostProcessGameObjectAndChildren: blueprintName: " .. s_Blueprint.name)
         s_GameObject.parentData = GameObjectParentData{
             guid = s_ParentPrimaryInstance,
             typeName = "LevelData",
@@ -180,6 +192,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
 
         table.insert(self.m_UnresolvedGameObjects[s_ParentPrimaryInstance], s_GameObject)
     end
+
 end
 
 function GameObjectManager:ResolveChildren(p_GameObject)
@@ -232,9 +245,10 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
         end
 
         self:SetGuidAndAddGameObjectRecursively(p_GameObject, false, s_PendingInfo.customGuid, s_PendingInfo.creatorName)
-    else
-        self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
-        local s_VanillaGuid = GenerateVanillaGuid(self.m_VanillaBlueprintNumber)
+    else -- The object is a vanilla object but spawned after the level is loaded, fuck them (for now at least, they seem to be server and client only)
+        --TODO: change guid to vanilla, but to a server/client only guid
+        --local s_VanillaGuid
+        --s_VanillaGuid, self.m_VanillaBlueprintNumber= GenerateVanillaGuid(self.m_VanillaBlueprintNumber)
 
         self:SetGuidAndAddGameObjectRecursively(p_GameObject, true, s_VanillaGuid, "VanillaHook")
     end
@@ -246,24 +260,25 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
 end
 
 function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_IsVanilla, p_CustomGuid, p_CreatorName)
-    p_GameObject.guid = p_CustomGuid
-    p_GameObject.isVanilla = p_IsVanilla
+    --m_Logger:Write(tostring(p_GameObject.guid).. " to ".. tostring(p_CustomGuid))
+    --p_GameObject.guid = p_CustomGuid
+    --p_GameObject.isVanilla = p_IsVanilla
     p_GameObject.creatorName = p_CreatorName
 
     if p_GameObject.children ~= nil then
         for _, s_ChildGameObject in pairs(p_GameObject.children) do
-            local s_ChildGuid
-
-            if (p_IsVanilla == true) then
-                self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
-
-                s_ChildGuid = GenerateVanillaGuid(self.m_VanillaBlueprintNumber)
-            else
-                s_ChildGuid = GenerateCustomGuid()
-            end
+            --local s_ChildGuid
+            --
+            --if (p_IsVanilla == true) then
+            --    self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
+            --
+            --    s_ChildGuid = GenerateVanillaGuid(self.m_VanillaBlueprintNumber)
+            --else
+            --    s_ChildGuid = GenerateCustomGuid()
+            --end
 
             -- Update parentData as well:
-            s_ChildGameObject.parentData.guid = p_CustomGuid
+            s_ChildGameObject.parentData.guid = p_GameObject.guid
             --s_ChildGameObject.parentData.typeName = p_GameObject.blueprintCtrRef.typeName
             --s_ChildGameObject.parentData.primaryInstanceGuid = p_GameObject.blueprintCtrRef.instanceGuid
             --s_ChildGameObject.parentData.partitionGuid = p_GameObject.blueprintCtrRef.partitionGuid
@@ -324,6 +339,7 @@ end
 
 
 function GameObjectManager:SetTransform(p_Guid, p_LinearTransform, p_UpdateCollision)
+    self:OnLevelLoaded()
     local s_GameObject = self.m_GameObjects[p_Guid]
 
     if s_GameObject == nil then

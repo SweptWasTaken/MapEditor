@@ -68,6 +68,7 @@ end
 
 function MapEditorClient:OnLevelLoaded(p_MapName, p_GameModeName)
 	InstanceParser:OnLevelLoaded(p_MapName, p_GameModeName)
+	GameObjectManager:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function MapEditorClient:OnLoaded()

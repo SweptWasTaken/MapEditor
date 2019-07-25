@@ -41,6 +41,7 @@ end
 
 function MapEditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
 	EditorServer:OnLevelLoaded(p_Map, p_GameMode, p_Round)
+	GameObjectManager:OnLevelLoaded(p_MapName, p_GameModeName)
 end
 
 function MapEditorServer:OnLevelDestroy()
