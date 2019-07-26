@@ -108,6 +108,7 @@ function EditorServer:OnReceiveCommands(p_Player, p_Commands, p_UpdatePass)
 			table.insert(s_CommandActionResults, s_CommandActionResult)
 
 			local s_Guid = s_GameObjectTransferData.guid
+
 			self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData) -- overwrite our table with gameObjectTransferDatas so we have the current most version
 
 			table.insert(self.m_Transactions, s_Guid) -- Store that this transaction has happened.
@@ -134,6 +135,7 @@ function EditorServer:OnGameObjectReady(p_GameObject)
 	local s_GameObjectTransferData = p_GameObject:GetGameObjectTransferData()
 	local s_Guid = s_GameObjectTransferData.guid
 	self.m_GameObjectTransferDatas[s_Guid] = MergeGameObjectTransferData(self.m_GameObjectTransferDatas[s_Guid], s_GameObjectTransferData)
+
 	-- TODO: xD
 end
 

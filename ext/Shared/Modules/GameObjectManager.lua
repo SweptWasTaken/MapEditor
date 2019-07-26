@@ -161,7 +161,7 @@ function GameObjectManager:OnEntityCreateFromBlueprint(p_Hook, p_Blueprint, p_Tr
         children = {}
     }
 
-    s_GameObject.blueprintCtrRef = CtrRef {
+    s_GameObject.blueprintCtrRef = CtrRef{
         typeName = s_Blueprint.typeInfo.name,
         name = s_Blueprint.name,
         partitionGuid = s_BlueprintPartitionGuid,
@@ -222,7 +222,7 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
     local s_BlueprintInstanceGuid = p_GameObject.blueprintCtrRef.instanceGuid
     local s_PendingInfo = self.m_PendingCustomBlueprintGuids[s_BlueprintInstanceGuid]
 
-    if (s_PendingInfo ~= nil) then -- the spawning of this blueprint was invoked by the user
+    if (s_PendingInfo ~= nil) then --- The spawning of this blueprint was invoked by the user
 
         local s_ParentData = GameObjectParentData{
             guid = s_PendingInfo.parentData.guid,
@@ -244,13 +244,9 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
 
         end
 
-        self:SetGuidAndAddGameObjectRecursively(p_GameObject, false, s_PendingInfo.customGuid, s_PendingInfo.creatorName)
-    else -- The object is a vanilla object but spawned after the level is loaded, fuck them (for now at least, they seem to be server and client only)
-        --TODO: change guid to vanilla, but to a server/client only guid
-        --local s_VanillaGuid
-        --s_VanillaGuid, self.m_VanillaBlueprintNumber= GenerateVanillaGuid(self.m_VanillaBlueprintNumber)
-
-        self:SetGuidAndAddGameObjectRecursively(p_GameObject, true, s_VanillaGuid, "VanillaHook")
+        self:SetGuidAndAddGameObjectRecursively(p_GameObject, s_PendingInfo.customGuid, s_PendingInfo.creatorName)
+    else --- The object is a vanilla object. Its guid is already set.
+        self:SetGuidAndAddGameObjectRecursively(p_GameObject, nil, "VanillaHook")
     end
 
     self.m_PendingCustomBlueprintGuids[s_BlueprintInstanceGuid] = nil
@@ -259,23 +255,16 @@ function GameObjectManager:PostProcessGameObjectAndChildren(p_GameObject)
     Events:DispatchLocal("GameObjectManager:GameObjectReady", p_GameObject)
 end
 
-function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_IsVanilla, p_CustomGuid, p_CreatorName)
-    --m_Logger:Write(tostring(p_GameObject.guid).. " to ".. tostring(p_CustomGuid))
-    --p_GameObject.guid = p_CustomGuid
-    --p_GameObject.isVanilla = p_IsVanilla
+function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_CustomGuid, p_CreatorName)
+
+    if p_CustomGuid ~= nil then
+        p_GameObject.guid = p_CustomGuid
+    end
+
     p_GameObject.creatorName = p_CreatorName
 
     if p_GameObject.children ~= nil then
         for _, s_ChildGameObject in pairs(p_GameObject.children) do
-            --local s_ChildGuid
-            --
-            --if (p_IsVanilla == true) then
-            --    self.m_VanillaBlueprintNumber = self.m_VanillaBlueprintNumber + 1
-            --
-            --    s_ChildGuid = GenerateVanillaGuid(self.m_VanillaBlueprintNumber)
-            --else
-            --    s_ChildGuid = GenerateCustomGuid()
-            --end
 
             -- Update parentData as well:
             s_ChildGameObject.parentData.guid = p_GameObject.guid
@@ -283,7 +272,7 @@ function GameObjectManager:SetGuidAndAddGameObjectRecursively(p_GameObject, p_Is
             --s_ChildGameObject.parentData.primaryInstanceGuid = p_GameObject.blueprintCtrRef.instanceGuid
             --s_ChildGameObject.parentData.partitionGuid = p_GameObject.blueprintCtrRef.partitionGuid
 
-            self:SetGuidAndAddGameObjectRecursively(s_ChildGameObject, p_IsVanilla, s_ChildGuid, p_CreatorName)
+            self:SetGuidAndAddGameObjectRecursively(s_ChildGameObject, nil, p_CreatorName)
 	        self.m_GameObjects[tostring(s_ChildGameObject.guid)] = s_ChildGameObject
         end
     end
