@@ -1,5 +1,5 @@
-class EditorCore {
-
+export class EditorCore {
+    public raycastTransform: LinearTransform;
 
     constructor() {
         this.raycastTransform = new LinearTransform();
@@ -20,7 +20,7 @@ class EditorCore {
     }
 
     getRaycastTransform() {
-        return this.raycastTransform.clone()
+        return public raycastTransform.clone()
     }
 
     setUpdating(value) {
