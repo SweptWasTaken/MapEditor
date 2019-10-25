@@ -2,6 +2,7 @@
   "compileOnSave": true,
   "buildOnSave": true,
   "compilerOptions": {
+    "noImplicitAny" : false,
     "module": "esnext",
     "target": "es5",
     "lib": ["dom", "esnext"],

@@ -1,4 +1,6 @@
-const SetObjectNameCommand = function (gameObjectTransferData, newGameObjectName) {
+import Command from "../libs/three/Command";
+
+function SetObjectNameCommand(this: any, gameObjectTransferData, newGameObjectName) {
 
 	Command.call(this);
 

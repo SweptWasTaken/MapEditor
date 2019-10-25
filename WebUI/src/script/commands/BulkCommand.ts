@@ -1,10 +1,12 @@
 import Command from "../libs/three/Command";
 
 export default class BulkCommand extends Command {
+	public commands;
+	
 	constructor(commands) {
 		super();
 		this.type = 'BulkCommand';
-		this.name = 'Bulk command ' + commands[0].name;
+		this.name = 'Bulk command' + commands[0].name;
 		this.commands = commands;
 	}
 

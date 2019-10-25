@@ -1,6 +1,8 @@
 import Command from "../libs/three/Command";
 
 export default class DestroyBlueprintCommand extends Command {
+	public gameObjectTransferData;
+
 	constructor(gameObjectTransferData) {
 		super();
 		this.type = 'DestroyBlueprintCommand';
@@ -19,4 +21,3 @@ export default class DestroyBlueprintCommand extends Command {
 		editor.vext.SendCommand(new VextCommand("SpawnBlueprintCommand", this.gameObjectTransferData))
 	}
 };
-
